@@ -25,9 +25,9 @@ const BIRTHDAY_PROPERTY = process.env.ATTENDEE_BIRTHDAY_PROPERTY || "Birthday";
 const CONTACT_PROPERTY = process.env.ATTENDEE_CONTACT_PROPERTY || "Contact";
 const FB_PROPERTY = process.env.ATTENDEE_FB_PROPERTY || "FB Link";
 
-const RELATION_PROPERTY = process.env.ATTENDANCE_RELATION_PROPERTY || "Attendee";
-const DATE_PROPERTY = process.env.ATTENDANCE_DATE_PROPERTY || "Date";
-const TITLE_PROPERTY = process.env.ATTENDANCE_TITLE_PROPERTY || "Name";
+const RELATION_PROPERTY = process.env.ATTENDANCE_RELATION_PROPERTY || "Attendees";
+const DATE_PROPERTY = process.env.ATTENDANCE_DATE_PROPERTY || "date";
+const TITLE_PROPERTY = process.env.ATTENDANCE_TITLE_PROPERTY || "Week & Month";
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -164,68 +164,63 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Prevent duplicate attendance
+    const attendanceTitle = getWeekAndMonthTitle(serviceDate);
     const existingAttendance = await notion.dataSources.query({
       data_source_id: await ATTENDANCE_DATA_SOURCE,
       filter: {
-        and: [
-          {
-            property: RELATION_PROPERTY,
-            relation: {
-              contains: attendeeId
-            }
-          },
-          {
-            property: DATE_PROPERTY,
-            date: {
-              equals: serviceDate
-            }
-          }
-        ]
+        property: TITLE_PROPERTY,
+        title: {
+          equals: attendanceTitle
+        }
       },
       page_size: 1
     });
 
     if (existingAttendance.results.length > 0) {
-      return res.status(409).json({
-        error: "This attendee is already registered for this service date."
-      });
-    }
+      const attendancePage = existingAttendance.results[0];
+      const attendees = attendancePage.properties[RELATION_PROPERTY]?.relation || [];
 
-    // Create attendance record
-    const attendanceTitle =
-      `Attendance - ${attendeeId.slice(0, 8)} - ${serviceDate}`;
+      if (attendees.some(attendee => attendee.id === attendeeId)) {
+        return res.status(409).json({
+          error: "This attendee is already registered for this week."
+        });
+      }
 
-    await notion.pages.create({
-      parent: {
-        database_id: ATTENDANCE_DB
-      },
-      properties: {
-        [TITLE_PROPERTY]: {
-          title: [
-            {
-              text: {
-                content: attendanceTitle
-              }
-            }
-          ]
-        },
-
-        [RELATION_PROPERTY]: {
-          relation: [
-            {
-              id: attendeeId
-            }
-          ]
-        },
-
-        [DATE_PROPERTY]: {
-          date: {
-            start: serviceDate
+      await notion.pages.update({
+        page_id: attendancePage.id,
+        properties: {
+          [RELATION_PROPERTY]: {
+            relation: [
+              ...attendees.map(attendee => ({ id: attendee.id })),
+              { id: attendeeId }
+            ]
           }
         }
-      }
-    });
+      });
+    } else {
+      await notion.pages.create({
+        parent: {
+          database_id: ATTENDANCE_DB
+        },
+        properties: {
+          [TITLE_PROPERTY]: {
+            title: [
+              {
+                text: {
+                  content: attendanceTitle
+                }
+              }
+            ]
+          },
+          [RELATION_PROPERTY]: {
+            relation: [{ id: attendeeId }]
+          },
+          [DATE_PROPERTY]: {
+            date: { start: serviceDate }
+          }
+        }
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -262,4 +257,27 @@ function validateFacebookUrl(value) {
   } catch {
     return null;
   }
+}
+
+function getWeekAndMonthTitle(serviceDate) {
+  const date = new Date(`${serviceDate}T00:00:00Z`);
+  const weekNumber = Math.ceil(date.getUTCDate() / 7);
+  const month = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    timeZone: "UTC"
+  }).format(date);
+
+  return `${getOrdinal(weekNumber)} Week of '${month}'`;
+}
+
+function getOrdinal(number) {
+  if (number % 100 >= 11 && number % 100 <= 13) {
+    return `${number}th`;
+  }
+
+  return `${number}${{
+    1: "st",
+    2: "nd",
+    3: "rd"
+  }[number % 10] || "th"}`;
 }
