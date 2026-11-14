@@ -1,0 +1,116 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+  color: #222;
+}
+
+.container {
+  max-width: 550px;
+  margin: 30px auto;
+}
+
+header {
+  margin-bottom: 25px;
+}
+
+header h1 {
+  margin-bottom: 5px;
+}
+
+header p {
+  color: #777;
+}
+
+.card {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+h2 {
+  font-size: 18px;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 15px 0 6px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: 2px solid #555;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 15px;
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.result {
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  margin-top: 6px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.result:hover {
+  background: #eee;
+}
+
+.selected-person {
+  background: #f0f0f0;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.hidden {
+  display: none;
+}
+
+#message {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+#message.error {
+  color: #c0392b;
+}
+
+#message.success {
+  color: #218838;
+}

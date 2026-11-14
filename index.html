@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DYM Attendance Registration</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="container">
+    <header>
+      <h1>DYM Attendance</h1>
+      <p>Attendance Registration System</p>
+    </header>
+
+    <section class="card">
+      <h2>Service Details</h2>
+
+      <label for="serviceDate">Date of Service</label>
+      <input type="date" id="serviceDate" required />
+    </section>
+
+    <section class="card">
+      <h2>Existing Attendee</h2>
+
+      <label for="search">Search Attendee</label>
+      <input
+        type="text"
+        id="search"
+        placeholder="Enter attendee name..."
+        autocomplete="off"
+      />
+
+      <div id="results"></div>
+
+      <div id="selectedSection" class="hidden">
+        <div class="selected-person">
+          <strong>Selected Attendee:</strong>
+          <p id="selectedName"></p>
+        </div>
+
+        <button id="registerExistingBtn">
+          Register Attendance
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>First-time Visitor</h2>
+
+      <form id="newVisitorForm">
+        <label for="newName">Full Name</label>
+        <input id="newName" required placeholder="Full name" />
+
+        <label for="newBirthday">Birthday</label>
+        <input id="newBirthday" type="date" />
+
+        <label for="newContact">Contact Number</label>
+        <input id="newContact" placeholder="Contact number" />
+
+        <label for="newFbLink">Facebook Profile Link</label>
+        <input
+          id="newFbLink"
+          type="url"
+          placeholder="https://facebook.com/..."
+        />
+
+        <button type="submit">Register New Visitor</button>
+      </form>
+    </section>
+
+    <p id="message" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
