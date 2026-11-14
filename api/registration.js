@@ -25,9 +25,9 @@ const BIRTHDAY_PROPERTY = process.env.ATTENDEE_BIRTHDAY_PROPERTY || "Birthday";
 const CONTACT_PROPERTY = process.env.ATTENDEE_CONTACT_PROPERTY || "Contact";
 const FB_PROPERTY = process.env.ATTENDEE_FB_PROPERTY || "FB Link";
 
-const RELATION_PROPERTY = process.env.ATTENDANCE_RELATION_PROPERTY || "Attendees";
-const DATE_PROPERTY = process.env.ATTENDANCE_DATE_PROPERTY || "date";
-const TITLE_PROPERTY = process.env.ATTENDANCE_TITLE_PROPERTY || "Week & Month";
+const RELATION_PROPERTY = "Attendees";
+const DATE_PROPERTY = "Date";
+const TITLE_PROPERTY = "Week & Month";
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -267,7 +267,7 @@ function getWeekAndMonthTitle(serviceDate) {
     timeZone: "UTC"
   }).format(date);
 
-  return `${getOrdinal(weekNumber)} Week of '${month}'`;
+  return `${getOrdinal(weekNumber)} Week of ${month}`;
 }
 
 function getOrdinal(number) {
