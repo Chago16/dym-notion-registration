@@ -29,6 +29,20 @@ function getDatabaseId(value, variableName) {
   );
 }
 
+async function getDataSourceId(notion, databaseId, variableName) {
+  const database = await notion.databases.retrieve({
+    database_id: databaseId
+  });
+  const dataSource = database.data_sources?.[0];
+
+  if (!dataSource?.id) {
+    throw new Error(`${variableName} has no accessible data source.`);
+  }
+
+  return dataSource.id;
+}
+
 module.exports = {
-  getDatabaseId
+  getDatabaseId,
+  getDataSourceId
 };

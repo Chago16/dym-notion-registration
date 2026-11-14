@@ -1,6 +1,6 @@
 
 const { Client } = require("@notionhq/client");
-const { getDatabaseId } = require("./notion-config");
+const { getDatabaseId, getDataSourceId } = require("./notion-config");
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY
@@ -12,6 +12,11 @@ const ATTENDEES_DB = getDatabaseId(
 );
 const ATTENDANCE_DB = getDatabaseId(
   process.env.NOTION_ATTENDANCE_DB_ID,
+  "NOTION_ATTENDANCE_DB_ID"
+);
+const ATTENDANCE_DATA_SOURCE = getDataSourceId(
+  notion,
+  ATTENDANCE_DB,
   "NOTION_ATTENDANCE_DB_ID"
 );
 
@@ -160,8 +165,8 @@ module.exports = async function handler(req, res) {
     }
 
     // Prevent duplicate attendance
-    const existingAttendance = await notion.databases.query({
-      database_id: ATTENDANCE_DB,
+    const existingAttendance = await notion.dataSources.query({
+      data_source_id: await ATTENDANCE_DATA_SOURCE,
       filter: {
         and: [
           {

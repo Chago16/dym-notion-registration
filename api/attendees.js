@@ -1,12 +1,17 @@
 
 const { Client } = require("@notionhq/client");
-const { getDatabaseId } = require("./notion-config");
+const { getDatabaseId, getDataSourceId } = require("./notion-config");
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY
 });
 const attendeesDatabaseId = getDatabaseId(
   process.env.NOTION_ATTENDEES_DB_ID,
+  "NOTION_ATTENDEES_DB_ID"
+);
+const attendeesDataSourceId = getDataSourceId(
+  notion,
+  attendeesDatabaseId,
   "NOTION_ATTENDEES_DB_ID"
 );
 
@@ -24,8 +29,8 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const response = await notion.databases.query({
-      database_id: attendeesDatabaseId,
+    const response = await notion.dataSources.query({
+      data_source_id: await attendeesDataSourceId,
       filter: {
         property: process.env.ATTENDEE_NAME_PROPERTY || "Name",
         title: {
