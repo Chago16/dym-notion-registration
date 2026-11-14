@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#061c4d" />
   <title>DYM Attendance Registration</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -12,68 +12,111 @@
   <main class="container">
     <header>
       <h1>DYM Attendance</h1>
-      <p>Attendance Registration System</p>
+      <p>
+        “Not forsaking the assembling of ourselves together, as the manner of
+        some is; but exhorting one another: and so much the more, as ye see the
+        day approaching.”
+      </p>
+      <cite>Hebrews 10:25</cite>
     </header>
 
-    <section class="card">
-      <h2>Service Details</h2>
-
-      <label for="serviceDate">Date of Service</label>
+    <section class="date-strip">
+      <label for="serviceDate">Service date</label>
       <input type="date" id="serviceDate" required />
     </section>
 
-    <section class="card">
-      <h2>Existing Attendee</h2>
-
-      <label for="search">Search Attendee</label>
-      <input
-        type="text"
-        id="search"
-        placeholder="Enter attendee name..."
-        autocomplete="off"
-      />
-
-      <div id="results"></div>
-
-      <div id="selectedSection" class="hidden">
-        <div class="selected-person">
-          <strong>Selected Attendee:</strong>
-          <p id="selectedName"></p>
-        </div>
-
-        <button id="registerExistingBtn">
-          Register Attendance
+    <div class="registration-grid">
+      <div class="registration-switch" role="tablist" aria-label="Registration type">
+        <button id="existingTab" class="active" type="button" role="tab" aria-selected="true" aria-controls="existingSection">
+          Returning attendee
+        </button>
+        <button id="newTab" type="button" role="tab" aria-selected="false" aria-controls="newSection">
+          First-time visitor
         </button>
       </div>
-    </section>
 
-    <section class="card">
-      <h2>First-time Visitor</h2>
+      <section class="card registration-panel" id="existingSection" role="tabpanel" aria-labelledby="existingTab">
+        <h2>Returning attendee</h2>
+        <p>Search for someone who is already registered.</p>
 
-      <form id="newVisitorForm">
-        <label for="newName">Full Name</label>
-        <input id="newName" required placeholder="Full name" />
-
-        <label for="newBirthday">Birthday</label>
-        <input id="newBirthday" type="date" />
-
-        <label for="newContact">Contact Number</label>
-        <input id="newContact" placeholder="Contact number" />
-
-        <label for="newFbLink">Facebook Profile Link</label>
+        <label for="search">Attendee name</label>
         <input
-          id="newFbLink"
-          type="url"
-          placeholder="https://facebook.com/..."
+          type="text"
+          id="search"
+          placeholder="Start typing a name..."
+          autocomplete="off"
         />
 
-        <button type="submit">Register New Visitor</button>
-      </form>
-    </section>
+        <div id="results" aria-live="polite"></div>
+
+        <div id="selectedSection" class="hidden">
+          <div class="selected-person">
+            <strong>Ready to register</strong>
+            <p id="selectedName"></p>
+          </div>
+
+          <button id="registerExistingBtn" type="button">
+            Register returning attendee
+          </button>
+        </div>
+      </section>
+
+      <section class="card registration-panel hidden" id="newSection" role="tabpanel" aria-labelledby="newTab">
+        <h2>First-time visitor</h2>
+        <p>Use this form if this person is not in the attendee list.</p>
+
+        <form id="newVisitorForm">
+          <label for="newName">Full name</label>
+          <input id="newName" required placeholder="Enter full name" autocomplete="name" />
+
+          <label for="newBirthday">Birthday <span class="required-note">(optional)</span></label>
+          <input id="newBirthday" type="date" />
+
+          <label for="newContact">Contact number <span class="required-note">(optional, digits only)</span></label>
+          <input id="newContact" type="tel" inputmode="numeric" placeholder="e.g. 09171234567" />
+
+          <label for="newFbLink">Facebook profile link <span class="required-note">(optional)</span></label>
+          <input id="newFbLink" type="url" placeholder="https://facebook.com/..." />
+
+          <button type="submit">Register first-time visitor</button>
+        </form>
+      </section>
+    </div>
 
     <p id="message" role="status" aria-live="polite"></p>
   </main>
 
   <script src="script.js"></script>
+  <script>
+    const statusMessage = document.getElementById("message");
+    let statusTimer;
+    const existingTab = document.getElementById("existingTab");
+    const newTab = document.getElementById("newTab");
+    const existingSection = document.getElementById("existingSection");
+    const newSection = document.getElementById("newSection");
+
+    function selectRegistrationType(type) {
+      const isExisting = type === "existing";
+      existingTab.classList.toggle("active", isExisting);
+      newTab.classList.toggle("active", !isExisting);
+      existingTab.setAttribute("aria-selected", String(isExisting));
+      newTab.setAttribute("aria-selected", String(!isExisting));
+      existingSection.classList.toggle("hidden", !isExisting);
+      newSection.classList.toggle("hidden", isExisting);
+    }
+
+    existingTab.addEventListener("click", () => selectRegistrationType("existing"));
+    newTab.addEventListener("click", () => selectRegistrationType("new"));
+
+    new MutationObserver(() => {
+      clearTimeout(statusTimer);
+      if (!statusMessage.textContent) return;
+
+      statusTimer = setTimeout(() => {
+        statusMessage.textContent = "";
+        statusMessage.className = "";
+      }, 7000);
+    }).observe(statusMessage, { childList: true, characterData: true, subtree: true });
+  </script>
 </body>
 </html>
