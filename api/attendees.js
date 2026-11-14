@@ -1,9 +1,14 @@
 
 const { Client } = require("@notionhq/client");
+const { getDatabaseId } = require("./notion-config");
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY
 });
+const attendeesDatabaseId = getDatabaseId(
+  process.env.NOTION_ATTENDEES_DB_ID,
+  "NOTION_ATTENDEES_DB_ID"
+);
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -20,7 +25,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const response = await notion.databases.query({
-      database_id: process.env.NOTION_ATTENDEES_DB_ID,
+      database_id: attendeesDatabaseId,
       filter: {
         property: process.env.ATTENDEE_NAME_PROPERTY || "Name",
         title: {

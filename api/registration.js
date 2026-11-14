@@ -1,12 +1,19 @@
 
 const { Client } = require("@notionhq/client");
+const { getDatabaseId } = require("./notion-config");
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY
 });
 
-const ATTENDEES_DB = process.env.NOTION_ATTENDEES_DB_ID;
-const ATTENDANCE_DB = process.env.NOTION_ATTENDANCE_DB_ID;
+const ATTENDEES_DB = getDatabaseId(
+  process.env.NOTION_ATTENDEES_DB_ID,
+  "NOTION_ATTENDEES_DB_ID"
+);
+const ATTENDANCE_DB = getDatabaseId(
+  process.env.NOTION_ATTENDANCE_DB_ID,
+  "NOTION_ATTENDANCE_DB_ID"
+);
 
 const NAME_PROPERTY = process.env.ATTENDEE_NAME_PROPERTY || "Name";
 const BIRTHDAY_PROPERTY = process.env.ATTENDEE_BIRTHDAY_PROPERTY || "Birthday";
