@@ -21,8 +21,8 @@ const ATTENDANCE_DATA_SOURCE = getDataSourceId(
 );
 
 const NAME_PROPERTY = process.env.ATTENDEE_NAME_PROPERTY || "Name";
-const BIRTHDAY_PROPERTY = process.env.ATTENDEE_BIRTHDAY_PROPERTY || "Birthday";
-const CONTACT_PROPERTY = process.env.ATTENDEE_CONTACT_PROPERTY || "Contact";
+const BIRTHDAY_PROPERTY = "Birthdate";
+const CONTACT_PROPERTY = "Contact";
 const FB_PROPERTY = process.env.ATTENDEE_FB_PROPERTY || "FB Link";
 
 const RELATION_PROPERTY = "Attendees";
@@ -124,12 +124,16 @@ module.exports = async function handler(req, res) {
 
       // Optional contact
       if (contact) {
+        const contactNumber = Number(contact);
+
+        if (!Number.isSafeInteger(contactNumber) || contactNumber < 0) {
+          return res.status(400).json({
+            error: "Please provide a valid contact number."
+          });
+        }
+
         properties[CONTACT_PROPERTY] = {
-          rich_text: [
-            {
-              text: { content: contact }
-            }
-          ]
+          number: contactNumber
         };
       }
 
